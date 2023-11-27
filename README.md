@@ -10,4 +10,7 @@ Cilj projekta je razvoj i implementacija model mašinskog/dubokog učenja* koji 
 
 ## Metodologija
 
-### UZORAK LISTE 100 TECH KOMPANIJA
+### Uzorak liste 100 tech kompanija
+Za potrebe ovog istraživanja odabran je uzorak od 100 tech kompanija rangiranih prema vrednosti                    godišnjih prihoda.
+
+### Vrednost akcija
