@@ -1,11 +1,8 @@
 import json
+from collections import Counter
 
 
 STOCKS_DATA = 'data/stocks.json'
-
-
-class DataManager:
-    pass
 
 
 class JSONData:
@@ -45,72 +42,38 @@ class JSONData:
             print(f"Error loading data from {self.filename}: {e}")
             return None
 
-    def write_json(self, keys, value):
-        """
-        Write data to the JSON file using a specified set of keys.
 
-        This method reads the JSON file, modifies the value associated with the specified set of keys, and updates the JSON file with the new data.
+class StocksDataManager:
+    def __init__(self) -> None:
+        self.stocks_data = JSONData(STOCKS_DATA)
 
-        Parameters:
-        - keys (list): A list of keys to navigate through the JSON structure to locate the target value.
-        - value: The new value to be written to the JSON file.
-
-        Returns:
-        A message indicating the successful update of the JSON file.
-
-        Example:
-        >>> json_data = JSONData("data.json")
-        >>> result = json_data.write_json(["my", "nested", "key"], "new_value")
-        >>> print(result)
-
-        """
-        try:
-            with open(self.filename, 'r+') as json_file:
-                data = json.load(json_file)
-                nested_dict = data
-                for key in keys[:-1]:
-                    nested_dict = nested_dict.setdefault(key, {})
-                nested_dict[keys[-1]] = value
-                json_file.seek(0)
-                json.dump(data, json_file, indent=4)
-                json_file.truncate()
-            return f"'{'/'.join(keys)}' updated in the JSON file"
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"Error loading or writing data: {e}")
-            return None
-
-    def write_to_interview_sessions(self, main_key, value):
-        """
-        Update data in the 'interview_sessions' key in the JSON file.
-
-        This method updates the provided key with the new value in the 'interview_sessions' key of the JSON file.
-
-        Parameters:
-        - main_key: The key to update in the 'interview_sessions' key.
-        - value: The new value to be associated with the key.
-
-        Returns:
-        A message indicating the successful update of the JSON file.
-
-        Example:
-        >>> json_data = JSONData("data.json")
-        >>> result = json_data.write_to_interview_sessions("existing_key", "new_value")
-        >>> print(result)
-
-        """
-        try:
-            with open(self.filename, 'r+') as json_file:
-                data = json.load(json_file)
-                data["interview_sessions"] = value
-
-                json_file.seek(0)
-                json.dump(data, json_file, indent=4)
-                json_file.truncate()
-
-            return f"'{main_key}' updated in the 'interview_sessions' key of the JSON file"
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"Error loading or writing data: {e}")
-            return None
+    def get_ticker_symbols(self):
+        tickers = [ticker[0] for ticker in self.stocks_data.read_json('top_tech_companies').values()]
+        return tickers
+    
+    def ticker_symbol_generator(self):
+        for ticker in self.get_ticker_symbols():
+            yield ticker
+    
+    def get_countries(self):
+        companies = [ticker[1] for ticker in self.stocks_data.read_json('top_tech_companies').values()]
+        return list(set(companies))
+    
+    def get_country_counts(self):
+        companies = [ticker[1] for ticker in self.stocks_data.read_json('top_tech_companies').values()]
+        country_counts = Counter(companies)
+        return country_counts
+    
+    def get_country(self, ticker):
+        for value in self.stocks_data.read_json('top_tech_companies').values():
+            if value[0] == ticker:
+                return value[1]
+            
+    def get_company_name(self, ticker):
+        for key, value in self.stocks_data.read_json('top_tech_companies').items():
+            if value[0] == ticker:
+                return key
 
 
-
+# class JSONDataStockManager:
+    
