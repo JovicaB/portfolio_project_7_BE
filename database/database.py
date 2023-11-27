@@ -32,14 +32,14 @@ class MySQLConnection(DatabaseConnection):
     """
     def __init__(self):
         self.connection = self.connect()
-
+        
     def connect(self):
         connection = MySQLdb.connect(
-            host="localhost",
-            user="root",
-            password = 'o5!6i84P.j6>y',
-            database="etp",
-            port=3306,
+            host = os.environ.get('MYSQL_DB_PORT'),
+            user = os.environ.get('MYSQL_DB_USER'),
+            password = os.environ.get('MYSQL_DB_PASSWORD'),
+            database = os.environ.get('MYSQL_DB_DATABASE'),
+            port = os.environ.get('MYSQL_DB_PORT'),
             charset='utf8mb4'
         )
 
