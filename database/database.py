@@ -33,15 +33,15 @@ class MySQLConnection(DatabaseConnection):
         self.connection = self.connect()
 
     def connect(self):
+        """Establish a MySQL database connection."""
         connection = MySQLdb.connect(
-            host="localhost",
-            user="root",
-            password = 'o5!6i84P.j6>y',
-            database="etp",
-            port=3306,
+            host = os.environ.get('MYSQL_DB_HOST'),
+            user = os.environ.get('MYSQL_DB_USER'),
+            password = os.environ.get('MYSQL_DB_PASS'),
+            database = os.environ.get('MYSQL_DB_NAME'),
+            port = os.environ.get('MYSQL_DB_PORT'),
             charset='utf8mb4'
         )
-
         return connection
 
     def close(self):
