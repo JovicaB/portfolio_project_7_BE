@@ -11,3 +11,5 @@ etp/
 .vscode/
 *.idea/
 
+# database
+database/database.py
