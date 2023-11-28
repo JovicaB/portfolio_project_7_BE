@@ -1,3 +1,7 @@
-{"date":{
-    "ticker": "price"
-}}
+{
+    "current_date": 12,
+    "prices": {
+        "AMZN": 1,
+        "AAPL": 4
+    }
+}

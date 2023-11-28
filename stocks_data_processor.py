@@ -1,6 +1,7 @@
 import asyncio
-from data.stocks_json_data_manager import JSONStocksDataManager, JSONStocksDayDataManager
-from utilities.utilities import DateManager
+from .utilities.stocks_json_data_manager import JSONStocksDataManager
+# from utilities.stocks_json_data_manager import JSONStocksDataManager, JSONStocksDayDataManager
+# from utilities.utilities import DateManager
 import yfinance as yf
 
 
@@ -8,9 +9,10 @@ class StockPriceProcessor:
     """class for s
     """
     def __init__(self) -> None:
+        pass
         self.ticker_processor = JSONStocksDataManager()
-        self.current_date = DateManager().todays_date_str()
-        self.current_day_data = {self.current_date: {}}
+        # self.current_date = DateManager().todays_date_str()
+        # self.current_day_data = {self.current_date: {}}
 
     def get_stock_price(self, ticker):
         ticker_object = yf.Ticker(ticker)
@@ -28,8 +30,8 @@ class StockPriceProcessor:
         for ticker in tickers:
             await process_ticker(ticker)
 
-        self.current_day_data[self.current_date] = data_dict
-        return self.current_day_data
+        # self.current_day_data[self.current_date] = data_dict
+        # return self.current_day_data
 
     async def temp(self):
         result = await self.generate_stock_prices()
@@ -41,9 +43,9 @@ print(stocks_data)
 
 
 
-class StockDataSetter:
-    def __init__(self) -> None:
-        json_processor = JSONStocksDayDataManager()
+# class StockDataManager:
+#     def __init__(self) -> None:
+#         json_processor = JSONStocksDayDataManager()
 
 #     @staticmethod
 #     def price_difference(old_price, new_price):
