@@ -1,3 +1,4 @@
+
 # jos proveriti najoptimalniju opciju, da li YF ima daily average zbog dnevne volatilnosti, podaci se proveravaju 2x dnevno zbog razlike u vremenskim zonama razlicitih berzi, 
 # podaci ce se snimati u DB kao JSON string
 # potreban je checker da li su podaci generisani i snimljeni, odnosno da li svaki ticker iz liste za prethodni datum ima vrednost u JSON objektu
