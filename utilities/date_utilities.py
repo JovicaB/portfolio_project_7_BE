@@ -1,3 +1,4 @@
+### FINISHED
 from datetime import datetime, date, timedelta
 
 
@@ -7,7 +8,7 @@ class DateManager:
         """ Returns the today's date.
 
         Returns:
-            Today's date: str
+            Today's date: (str)
         """
         todays_date = date.today()
         todays_date_str = todays_date.strftime("%d-%m-%Y")
@@ -17,10 +18,10 @@ class DateManager:
         """ Calculates and returns the next working date.
 
         Args:
-            input_str_date (_type_): _description_
+            date_str (str): e.g.'29-11-2023'
 
         Returns:
-            Next working date: str
+            Next working date: (str)
         """
         date_object = datetime.strptime(date_str, "%d-%m-%Y")
         todays_date = date_object.date()
@@ -48,9 +49,16 @@ class DateManager:
         except ValueError as e:
             print(f"Error: {e}")
             return None
-    
-# x = '29-11-2023'
-# print(DateManager().tomorrow_date_str(x))
+
+## USAGE
+# class_instance = DateManager()
+
+# print(class_instance.todays_date_str())
+# data = '29-11-2023'
+# print(class_instance.tomorrow_date_str(data))
+# print(class_instance.format_to_date_objet(data))
+
+
 
 
 
