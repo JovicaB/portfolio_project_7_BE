@@ -141,9 +141,17 @@ class JSONStocksDayDataSetter:
         value = DateManager().todays_date_str()
 
         self.current_data.write_json(key, value)
-        return "New date set"
+        return value
 
-    def set_new_day_data(self, stock_data):
+    def set_new_day_data(self, stock_data: dict):
+        """Creates current day data stucture with data
+
+        Args:
+            stock_data (dict): with 2 keys (tickers, prices)
+
+        Returns:
+            Confirmation message
+        """
         key = ["prices"]
 
         keys = stock_data['tickers']
@@ -154,6 +162,11 @@ class JSONStocksDayDataSetter:
         return 'Current day data stored'
 
     def clear_new_day_data(self):
+        """Clears current day data from JSON file
+
+        Returns:
+            Confirmation message
+        """
         #date
         key = ["current_date"]
         self.current_data.write_json(key, None)
@@ -170,6 +183,11 @@ class JSONStocksDayDataSetter:
         return "Current day data cleared"
 
     def copy_new_day_data_to_previous(self):
+        """Copies current day data into last day data
+
+        Returns:
+            Confirmation message
+        """
 
         try:
             shutil.copyfile(CURRENT_DAY_DATA, LAST_DAY_DATA)
@@ -180,6 +198,11 @@ class JSONStocksDayDataSetter:
             return None
         
     def get_stocks_data(self):
+        """Gathers data from both days for difference calculation and DB saving
+
+        Returns:
+            dict: Current and previous day stock data
+        """
         day_data = {
             'tickers': self.tickers,
             'current_day_prices': None,
@@ -193,7 +216,7 @@ class JSONStocksDayDataSetter:
     
 
 ## USAGE
-class_instance = JSONStocksDayDataSetter()
+# class_instance = JSONStocksDayDataSetter()
 
 # print(class_instance.set_new_day_date())
 # data = {'tickers': ["AMZN", "AAPL"], 'prices': [155, 157]}

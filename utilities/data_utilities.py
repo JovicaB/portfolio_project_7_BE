@@ -1,17 +1,17 @@
 class DataUtilities:
 
     @staticmethod
-    def calculate_difference(first_value: float, second_value: float) -> float:
+    def calculate_difference(new_value: float, old_value: float) -> float:
         """Calculate increase/decrease between 2 numbers
 
         Args:
-            first_value (float):
-            second_value (float): 
+            new_value (float):
+            old_value (float): 
 
         Returns:
             float: increase/descrease difference between 2 numbers
         """
-        return (second_value - first_value) / first_value
+        return round((old_value - new_value) / new_value, 4)
 
     
 ## USAGE

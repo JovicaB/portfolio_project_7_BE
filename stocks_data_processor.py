@@ -1,5 +1,6 @@
 import asyncio
 from database.database_module import DatabaseManager
+from utilities.data_utilities import DataUtilities
 from utilities.json_stocks_manager import JSONStocksDataExtractor
 from utilities.json_stocks_manager import JSONStocksDayDataSetter
 from utilities.json_stocks_manager import JSONStocksDayDataValidator
@@ -7,17 +8,29 @@ import yfinance as yf
 
 
 class StockPriceGatherer:
-    """class for
-    """
     def __init__(self) -> None:
         self.ticker_processor = JSONStocksDataExtractor()
 
-    def get_stock_price(self, ticker):
+    def get_stock_price(self, ticker: str) -> float:
+        """Get stock price for ticker_symbol argument
+
+        Args:
+            ticker (str): Company ticker symbol
+
+        Returns:
+            float: Current price of a compeny stock
+        """
         ticker_object = yf.Ticker(ticker)
         price = ticker_object.info['currentPrice']
         return price
 
-    async def generate_stock_prices(self):
+    async def generate_stock_prices(self) -> dict:
+        """Async method that retrieves prices for 100 companies, next ticker iteration is after previous ticker price is processed
+
+        Returns:
+            dict: 2 keys: 'ticker' : with value that is list of tickers,
+                          'prices' : list of prices for provides ticker symbols
+        """
         tickers = self.ticker_processor.get_ticker_symbols()
         data_dict = {'tickers': tickers,
                      'prices': []}
@@ -39,66 +52,65 @@ class StocksDataGenerator:
         self.json_data_validate = JSONStocksDayDataValidator()
         self.json_set_data = JSONStocksDayDataSetter()
         self.price_generator = StockPriceGatherer()
-        self.json_data = JSONStocksDayDataSetter()
 
     async def generate_stocks_prices(self):
+        """Instance of StockPriceGatherer class and use of async generate_stock_prices method
+
+        Returns:
+            dict: 2 keys: 'ticker' : with value that is list of tickers,
+                          'prices' : list of prices for provides ticker symbols
+        """
         result = await self.price_generator.generate_stock_prices()
         return result
     
     def set_stocks_data(self):
-        self.json_set_data.set_new_day_date()
+        """ Daily routine for stock price retireval and saver of that data
+
+        Returns:
+            confirmation message
+        """
+        data_utilities = DataUtilities()
+
+        # set DB data
+        todays_date = self.json_set_data.set_new_day_date()
+        price_difference_data = {
+            'tickers': None, 
+            'difference_in_prices': None
+        }
+        
+        # retrieve stocks prices
         generate_prices = asyncio.run(self.generate_stocks_prices())
+
+        # set jsnon current day data
         self.json_set_data.set_new_day_data(generate_prices)
 
+        # checks if previous day has data, if not it means it is first iteration 
         if self.json_data_validate.validate_day_data('P'):
-            print('sa calculate difference i copy, clear and save difference data to database')
+            # creates data for difference calculation and DB
+            stock_price_values = self.json_set_data.get_stocks_data()
 
-        # self.json_data.set_new_day_date()
-        # price_data = asyncio.run(self.generate_stocks_prices())
+            # set ticker symbols into price_difference_data
+            price_difference_data['tickers'] = stock_price_values['tickers']
 
-    # print(class_instance.set_new_day_date())
-# data = {'tickers': ["AMZN", "AAPL"], 'prices': [155, 157]}
-# print(class_instance.set_new_day_data(data))
-# print(class_instance.clear_new_day_data())
-# print(class_instance.copy_new_day_data_to_previous())
+            # current and previous day data for difference calculation
+            current_prices = stock_price_values['current_day_prices']
+            previous_prices = stock_price_values['previous_day_prices']
+            difference = [data_utilities.calculate_difference(new_value, old_value) for new_value, old_value in zip(current_prices, previous_prices)]
+            price_difference_data['difference_in_prices'] = difference
 
-class_instance = StocksDataGenerator()
+            db_data = (todays_date, price_difference_data)
+            sql_query = "INSERT INTO stocks_data (data_date, stocks_data) " \
+                    "VALUES (%s, %s)"
+            DatabaseManager().save_data(sql_query, db_data)
 
-# generate_prices = asyncio.run(class_instance.generate_stocks_prices())
-# print(generate_prices)
-print(class_instance.set_stocks_data())
+            # copy current day data to previous day
+            self.json_set_data.copy_new_day_data_to_previous()
 
+            # clear json current day data
+            self.json_set_data.clear_new_day_data()
 
+            return f"Data is saved for {todays_date}"
+          
 
-
-
-    # async def temp(self):
-    #     result = await self.generate_stock_prices()
-    #     return result
-
-## USAGE
-# class_instance = StockPriceGatherer()
-
-# stocks_price_generator = asyncio.run(class_instance.generate_stock_prices())
-# print(stocks_price_generator)
-
-
-
-
-
-
-
-
-# #     @staticmethod
-# #     def price_difference(old_price, new_price):
-# #         return (new_price - old_price) / old_price
-
-
-# # 1. generate yfinance data for 100 stocks
-# # 2. populate current_day_prices.json
-# # 3. check if last_day_prices.json has data otherwise just copy current_day_prices.json -> last_day_prices.json
-# # 4. if last_day_prices.json has data:
-#     # - create JSON string with difference in prices % and save current date and JSON data to DB
-#     # - copy current_day_prices.json -> last_day_prices.json
-#     # - clear current_day_prices.json
-#     # - wait 24 hours for new day data
+# class_instance = StocksDataGenerator()
+# print(class_instance.set_stocks_data())

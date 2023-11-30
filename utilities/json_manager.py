@@ -2,10 +2,10 @@ import json
 
 
 class JSONDataManager:
-    def __init__(self, filename) -> None:
+    def __init__(self, filename: str) -> None:
         self.filename = filename
 
-    def read_json(self, key=None):
+    def read_json(self, key: str=None):
         """
         Read data from the JSON file based on a specified key.
 
@@ -38,7 +38,7 @@ class JSONDataManager:
             print(f"Error loading data from {self.filename}: {e}")
             return None
 
-    def write_json(self, keys, value):
+    def write_json(self, keys: list, value: str):
         """
         Write data to the JSON file using a specified set of keys.
 

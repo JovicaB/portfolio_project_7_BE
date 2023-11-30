@@ -5,6 +5,7 @@ class GetData:
     def get_ads_data(self):
         pass
 
+
 class CountActivation:
     def __init__(self) -> None:
         self.data_getter = GetData()
