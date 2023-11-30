@@ -2,7 +2,7 @@
 import shutil
 from collections import Counter
 from date_utilities import DateManager
-from json_data_manager import JSONDataManager
+from json_manager import JSONDataManager
 
 
 STOCKS_DATA = 'data/stocks.json'
@@ -146,8 +146,8 @@ class JSONStocksDayDataSetter:
     def set_new_day_data(self, stock_data):
         key = ["prices"]
 
-        keys = stock_data['keys']
-        values = stock_data['values']
+        keys = stock_data['tickers']
+        values = stock_data['prices']
         data_storage = {key:value for key,value in zip(keys, values)}
 
         self.current_data.write_json(key, data_storage)
@@ -184,7 +184,7 @@ class JSONStocksDayDataSetter:
 # class_instance = JSONStocksDayDataSetter()
 
 # print(class_instance.set_new_day_date())
-# data = {'keys': ["AMZN", "AAPL"], 'values': [155, 157]}
+# data = {'tickers': ["AMZN", "AAPL"], 'prices': [155, 157]}
 # print(class_instance.set_new_day_data(data))
 # print(class_instance.clear_new_day_data())
 # print(class_instance.copy_new_day_data_to_previous())

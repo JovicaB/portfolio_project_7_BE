@@ -1,53 +1,94 @@
 import asyncio
-from utilities.date_utilities import DateManager
-from utilities.stocks_json_data_manager import JSONStocksDataExtractor
-from utilities.stocks_json_data_manager import JSONStocksDayDataValidator
-from utilities.stocks_json_data_manager import JSONStocksDayDataSetter
 from database.database_module import DatabaseManager
-# import yfinance as yf
+from utilities.json_stocks_manager import JSONStocksDataExtractor
+from utilities.json_stocks_manager import JSONStocksDayDataSetter
+from utilities.json_stocks_manager import JSONStocksDayDataValidator
+import yfinance as yf
 
 
-# class StockPriceProcessor:
-#     """class for
-#     """
-#     def __init__(self) -> None:
-#         pass
-#         self.ticker_processor = JSONStocksDataManager()
-#         # self.current_date = DateManager().todays_date_str()
-#         # self.current_day_data = {self.current_date: {}}
+class StockPriceGatherer:
+    """class for
+    """
+    def __init__(self) -> None:
+        self.ticker_processor = JSONStocksDataExtractor()
 
-#     def get_stock_price(self, ticker):
-#         ticker_object = yf.Ticker(ticker)
-#         price = ticker_object.info['currentPrice']
-#         return price
+    def get_stock_price(self, ticker):
+        ticker_object = yf.Ticker(ticker)
+        price = ticker_object.info['currentPrice']
+        return price
 
-#     async def generate_stock_prices(self):
-#         tickers = self.ticker_processor.get_ticker_symbols()
-#         data_dict = {}
+    async def generate_stock_prices(self):
+        tickers = self.ticker_processor.get_ticker_symbols()
+        data_dict = {'tickers': tickers,
+                     'prices': []}
+        prices = []
 
-#         async def process_ticker(ticker):
-#             price = self.get_stock_price(ticker)
-#             data_dict[ticker] = price
+        async def process_ticker(ticker):
+            price = self.get_stock_price(ticker)
+            prices.append(price)
 
-#         for ticker in tickers:
-#             await process_ticker(ticker)
+        for ticker in tickers:
+            await process_ticker(ticker)
 
-#         # self.current_day_data[self.current_date] = data_dict
-#         # return self.current_day_data
-
-#     async def temp(self):
-#         result = await self.generate_stock_prices()
-#         return result
-
-# # Example usage:
-# stocks_data = asyncio.run(StockPriceProcessor().generate_stock_prices())
-# print(stocks_data)
+        data_dict['prices'] = prices
+        return data_dict
 
 
+class StocksDataGenerator:
+    def __init__(self) -> None:
+        self.json_data_validate = JSONStocksDayDataValidator()
+        self.json_set_data = JSONStocksDayDataSetter()
+        self.price_generator = StockPriceGatherer()
+        self.json_data = JSONStocksDayDataSetter()
 
-# # class StockDataGenerator:
-# #     def __init__(self) -> None:
-# #         json_processor = JSONStocksDayDataManager()
+    async def generate_stocks_prices(self):
+        result = await self.price_generator.generate_stock_prices()
+        return result
+    
+
+    def set_stocks_data(self):
+        self.json_set_data.set_new_day_date()
+        generate_prices = asyncio.run(self.generate_stocks_prices())
+        self.json_set_data.set_new_day_data(generate_prices)
+
+        if self.json_data_validate.validate_day_data('P'):
+            print('sa calculate difference i copy, clear and save difference data to database')
+
+        # self.json_data.set_new_day_date()
+        # price_data = asyncio.run(self.generate_stocks_prices())
+
+    # print(class_instance.set_new_day_date())
+# data = {'tickers': ["AMZN", "AAPL"], 'prices': [155, 157]}
+# print(class_instance.set_new_day_data(data))
+# print(class_instance.clear_new_day_data())
+# print(class_instance.copy_new_day_data_to_previous())
+
+class_instance = StocksDataGenerator()
+
+# generate_prices = asyncio.run(class_instance.generate_stocks_prices())
+# print(generate_prices)
+print(class_instance.set_stocks_data())
+
+
+
+
+
+    # async def temp(self):
+    #     result = await self.generate_stock_prices()
+    #     return result
+
+## USAGE
+# class_instance = StockPriceGatherer()
+
+# stocks_price_generator = asyncio.run(class_instance.generate_stock_prices())
+# print(stocks_price_generator)
+
+
+
+
+
+
+
 
 # #     @staticmethod
 # #     def price_difference(old_price, new_price):
