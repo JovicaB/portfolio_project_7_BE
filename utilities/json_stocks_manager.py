@@ -178,14 +178,27 @@ class JSONStocksDayDataSetter:
         except FileNotFoundError as e:
             print(f"Error copying data: {e}")
             return None
+        
+    def get_stocks_data(self):
+        day_data = {
+            'tickers': self.tickers,
+            'current_day_prices': None,
+            'previous_day_prices': None
+        }
+
+        day_data['current_day_prices'] = [price for price in self.current_data.read_json('prices').values()]
+        day_data['previous_day_prices'] = [price for price in self.previous_data.read_json('prices').values()]
+
+        return day_data
     
 
 ## USAGE
-# class_instance = JSONStocksDayDataSetter()
+class_instance = JSONStocksDayDataSetter()
 
 # print(class_instance.set_new_day_date())
 # data = {'tickers': ["AMZN", "AAPL"], 'prices': [155, 157]}
 # print(class_instance.set_new_day_data(data))
 # print(class_instance.clear_new_day_data())
 # print(class_instance.copy_new_day_data_to_previous())
+# print(class_instance.get_stocks_data())
 

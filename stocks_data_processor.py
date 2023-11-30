@@ -45,7 +45,6 @@ class StocksDataGenerator:
         result = await self.price_generator.generate_stock_prices()
         return result
     
-
     def set_stocks_data(self):
         self.json_set_data.set_new_day_date()
         generate_prices = asyncio.run(self.generate_stocks_prices())
