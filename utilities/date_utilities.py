@@ -49,14 +49,30 @@ class DateManager:
         except ValueError as e:
             print(f"Error: {e}")
             return None
+        
+    def is_workday(self, date: str) -> bool:
+        """Checks if provided date is workday
+
+        Args:
+            date (str): date (e.g 01-12-2023)
+
+        Returns:
+            bool: if arg date string workday True, if not False
+        """
+        date_object = datetime.strptime(date, "%d-%m-%Y")
+        if 0 <= date_object.weekday() <= 4:
+            return True
+        else:
+            return False
 
 ## USAGE
 # class_instance = DateManager()
 
 # print(class_instance.todays_date_str())
-# data = '29-11-2023'
+# data = '25-11-2023'
 # print(class_instance.tomorrow_date_str(data))
 # print(class_instance.format_to_date_objet(data))
+# print(class_instance.is_date_workday(data))
 
 
 
