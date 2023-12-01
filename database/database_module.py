@@ -42,12 +42,6 @@ class MySQLConnection(DatabaseConnection):
             database = os.environ.get('MYSQL_DB_NAME'),
             port = os.environ.get('MYSQL_DB_PORT'),
             charset='utf8mb4'
-            # host = os.environ.get('MYSQL_DB_HOST'),
-            # user = os.environ.get('MYSQL_DB_USER'),
-            # password = os.environ.get('MYSQL_DB_PASS'),
-            # database = os.environ.get('MYSQL_DB_NAME'),
-            # port = os.environ.get('MYSQL_DB_PORT'),
-            # charset='utf8mb4'
         )
         return connection
 

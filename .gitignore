@@ -12,4 +12,4 @@ etp/
 *.idea/
 
 # database
-database/database.py
+database/database_module.py
