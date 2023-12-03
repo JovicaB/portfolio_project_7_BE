@@ -112,5 +112,5 @@ class StocksDataGenerator:
             return f"Data is saved for {todays_date}"
           
 
-# class_instance = StocksDataGenerator()
-# print(class_instance.set_stocks_data())
+class_instance = StocksDataGenerator()
+print(class_instance.set_stocks_data())
