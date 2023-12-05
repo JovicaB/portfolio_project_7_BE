@@ -1,14 +1,17 @@
 {
     "current_date": "30-11-2023",
     "job_ads_websites": {
-        "Silicon Valley, USA": "https://www.indeed.com/jobs?q=it&l=Silicon+Valley%2C+CA&radius=100&vjk=8f7a29247d806efb",
-        "Bangalore, India": null,
-        "Shenzhen, China": null,
-        "Tel Aviv, Israel": null,
-        "London, UK": null,
-        "Berlin, Germany": null,
-        "Seoul, South Korea": null,
-        "Seattle, USA": null,
-        "Serbia" : "https://www.helloworld.rs/oglasi-za-posao/?isource=Helloworld.rs&icampaign=home-fancy-intro&imedium=site"
+        "United States": "https://www.linkedin.com/jobs/search/?currentJobId=3778382334&geoId=103644278&keywords=information%20technology&location=United%20States&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&originalSubdomain=rs&refresh=true",
+        "China": null,
+        "India": "https://www.linkedin.com/jobs/search/?currentJobId=3775142011&geoId=102713980&keywords=ad%20tech&location=India&origin=JOB_SEARCH_PAGE_SEARCH_BUTTON&originalSubdomain=in&refresh=true",
+        "Japan": null,
+        "South Korea": null,
+        "Germany": null,
+        "United Kingdom": null,
+        "Canada": null,
+        "Israel": null,
+        "Australia": "https://www.linkedin.com/jobs/search/?currentJobId=3768533604&geoId=101452733&keywords=information%20technology&location=Australia&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&originalSubdomain=rs&refresh=true",
+        "Serbia" : "https://www.linkedin.com/jobs/search/?currentJobId=3768509908&geoId=101855366&keywords=information%20technology&location=Serbia&origin=JOB_SEARCH_PAGE_SEARCH_BUTTON&originalSubdomain=rs&refresh=true"
     }
 }
+
