@@ -1,6 +1,7 @@
 from utilities.date_utilities import DateManager
 import schedule
 
+
 class GetData:
     def get_stocks_data(self):
         pass
