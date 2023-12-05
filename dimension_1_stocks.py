@@ -7,7 +7,7 @@ from utilities.json_stocks_manager import JSONStocksDayDataValidator
 import yfinance as yf
 
 
-class StockPriceGatherer:
+class GetStockPrices:
     def __init__(self) -> None:
         self.ticker_processor = JSONStocksDataExtractor()
 
@@ -51,10 +51,12 @@ class StocksDataGenerator:
     def __init__(self) -> None:
         self.json_data_validate = JSONStocksDayDataValidator()
         self.json_set_data = JSONStocksDayDataSetter()
-        self.price_generator = StockPriceGatherer()
+        self.price_generator = GetStockPrices()
+        self.data_utilities = DataUtilities()
+        self.database_manager = DatabaseManager()
 
     async def generate_stocks_prices(self):
-        """Instance of StockPriceGatherer class and use of async generate_stock_prices method
+        """Instance of GetStockPrices class and use of async generate_stock_prices method
 
         Returns:
             dict: 2 keys: 'ticker' : with value that is list of tickers,
@@ -69,7 +71,6 @@ class StocksDataGenerator:
         Returns:
             confirmation message
         """
-        data_utilities = DataUtilities()
 
         # set DB data
         todays_date = self.json_set_data.set_new_day_date()
@@ -95,13 +96,13 @@ class StocksDataGenerator:
             # current and previous day data for difference calculation
             current_prices = stock_price_values['current_day_prices']
             previous_prices = stock_price_values['previous_day_prices']
-            difference = [data_utilities.calculate_difference(new_value, old_value) for new_value, old_value in zip(current_prices, previous_prices)]
+            difference = [self.data_utilities.calculate_difference(new_value, old_value) for new_value, old_value in zip(current_prices, previous_prices)]
             price_difference_data['difference_in_prices'] = difference
 
             db_data = (todays_date, price_difference_data)
             sql_query = "INSERT INTO stocks_data (data_date, stocks_data) " \
                     "VALUES (%s, %s)"
-            DatabaseManager().save_data(sql_query, db_data)
+            self.database_manager.save_data(sql_query, db_data)
 
             # copy current day data to previous day
             self.json_set_data.copy_new_day_data_to_previous()

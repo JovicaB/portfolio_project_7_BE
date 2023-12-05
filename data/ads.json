@@ -1,6 +1,14 @@
 {
     "current_date": "30-11-2023",
-    "job_ads": {
-        "Silicon Valley" : 1
+    "job_ads_websites": {
+        "Silicon Valley, USA": null,
+        "Bangalore, India": null,
+        "Shenzhen, China": null,
+        "Tel Aviv, Israel": null,
+        "London, UK": null,
+        "Berlin, Germany": null,
+        "Seoul, South Korea": null,
+        "Seattle, USA": null,
+        "Serbia" : "https://www.helloworld.rs/oglasi-za-posao/?isource=Helloworld.rs&icampaign=home-fancy-intro&imedium=site"
     }
 }
