@@ -1,9 +1,9 @@
 import asyncio
 from database.database_module import DatabaseManager
-from utilities.data_utilities import DataUtilities
-from utilities.json_stocks_manager import JSONStocksDataExtractor
-from utilities.json_stocks_manager import JSONStocksDayDataSetter
-from utilities.json_stocks_manager import JSONStocksDayDataValidator
+from utilities.data_utilities import DataCalculations
+from utilities.json_dimension_1_manager import JSONStocksDataExtractor
+from utilities.json_dimension_1_manager import JSONStocksDayDataSetter
+from utilities.json_dimension_1_manager import JSONStocksDayDataValidator
 import yfinance as yf
 
 
@@ -52,7 +52,7 @@ class StocksDataGenerator:
         self.json_data_validate = JSONStocksDayDataValidator()
         self.json_set_data = JSONStocksDayDataSetter()
         self.price_generator = GetStockPrices()
-        self.data_utilities = DataUtilities()
+        self.data_utilities = DataCalculations()
         self.database_manager = DatabaseManager()
 
     async def generate_stocks_prices(self):
@@ -111,7 +111,8 @@ class StocksDataGenerator:
             self.json_set_data.clear_new_day_data()
 
             return f"Data is saved for {todays_date}"
-          
 
-class_instance = StocksDataGenerator()
-print(class_instance.set_stocks_data())
+  
+## USAGE
+# class_instance = StocksDataGenerator()
+# print(class_instance.set_stocks_data())

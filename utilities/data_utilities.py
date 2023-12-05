@@ -1,4 +1,4 @@
-class DataUtilities:
+class DataCalculations:
 
     @staticmethod
     def calculate_difference(new_value: float, old_value: float) -> float:

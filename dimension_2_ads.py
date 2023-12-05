@@ -66,9 +66,24 @@ class SerbiaJobAdsCounter(RegionJobAdsCounter):
             else:
                 return None
 
+
 class SiliconValleyJobAdsCounter(RegionJobAdsCounter):
-    pass
+    def __init__(self):
+        self.json_reader = JSONAdsDataExtractor()
+        country = "Silicon Valley, USA"
+        self.url = self.json_reader.get_ads_website(country)
+        self.word_to_search = "jobCount"
+        super().__init__(self.url)
+
+    def scrape(self, element_to_find):
+        pass
+
+    def job_ads_count(self):
+        pass
 
 
 # class_instance = SerbiaJobAdsCounter()
 # print(class_instance.job_ads_count())
+
+class_instance = SiliconValleyJobAdsCounter()
+print(class_instance.scrape())

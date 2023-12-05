@@ -7,12 +7,13 @@ from json_manager import JSONDataManager
 
 STOCKS_DATA = 'data/stocks.json'
 CURRENT_DAY_DATA = 'data/current_day_prices.json'
-LAST_DAY_DATA = 'data/last_day_prices.json'
+PREVIOUS_DAY_DATA = 'data/previous_day_prices.json'
 
 
 class JSONStocksDataExtractor:
     def __init__(self) -> None:
-        self.stocks_data = JSONDataManager(STOCKS_DATA)
+        self.json_stock_file = STOCKS_DATA
+        self.stocks_data = JSONDataManager(self.json_stock_file)
         self.main_json_key = 'top_tech_companies'
 
 
@@ -36,7 +37,7 @@ class JSONStocksDataExtractor:
             self.main_json_key).values()]
         return list(set(companies))
 
-    def get_country_counts(self):
+    def get_country_occurrences(self):
         """Retrieves dictionary of countries (keys) with counter as a value
 
         Returns:
@@ -80,15 +81,17 @@ class JSONStocksDataExtractor:
 
 # print(class_instance.get_ticker_symbols())
 # print(class_instance.get_countries())
-# print(class_instance.get_country_counts())
+# print(class_instance.get_country_occurrences())
 # print(class_instance.get_country('AAPL'))
 # print(class_instance.get_company_name('AAPL'))
 
 
 class JSONStocksDayDataValidator:
     def __init__(self) -> None:
-        self.current_data = JSONDataManager(CURRENT_DAY_DATA)
-        self.previous_data = JSONDataManager(LAST_DAY_DATA)
+        self.current_day_json = CURRENT_DAY_DATA
+        self.previous_day_json = PREVIOUS_DAY_DATA
+        self.current_data = JSONDataManager(self.current_day_json)
+        self.previous_data = JSONDataManager(self.previous_day_json)
 
     def validate_day_data(self, day_code: str) -> bool:
         """Validates the availability of data for a specific day.
@@ -118,7 +121,7 @@ class JSONStocksDayDataValidator:
         return True
 
 
-## USAGE
+# ## USAGE
 # class_instance = JSONStocksDayDataValidator()
 
 # print(class_instance.validate_day_data('T'))
@@ -127,8 +130,10 @@ class JSONStocksDayDataValidator:
 
 class JSONStocksDayDataSetter:
     def __init__(self) -> None:
-        self.current_data = JSONDataManager(CURRENT_DAY_DATA)
-        self.previous_data = JSONDataManager(LAST_DAY_DATA)
+        self.current_day_json = CURRENT_DAY_DATA
+        self.previous_day_json = PREVIOUS_DAY_DATA
+        self.current_data = JSONDataManager(self.current_day_json)
+        self.previous_data = JSONDataManager(self.previous_day_json)
         self.tickers = JSONStocksDataExtractor().get_ticker_symbols()
 
     def set_new_day_date(self):
@@ -190,7 +195,7 @@ class JSONStocksDayDataSetter:
         """
 
         try:
-            shutil.copyfile(CURRENT_DAY_DATA, LAST_DAY_DATA)
+            shutil.copyfile(self.current_day_json, self.previous_data)
 
             return "Data last day's data copy to last_day_prices.json"
         except FileNotFoundError as e:
@@ -215,7 +220,7 @@ class JSONStocksDayDataSetter:
         return day_data
     
 
-## USAGE
+# ## USAGE
 # class_instance = JSONStocksDayDataSetter()
 
 # print(class_instance.set_new_day_date())

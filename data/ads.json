@@ -1,7 +1,7 @@
 {
     "current_date": "30-11-2023",
     "job_ads_websites": {
-        "Silicon Valley, USA": null,
+        "Silicon Valley, USA": "https://www.indeed.com/jobs?q=it&l=Silicon+Valley%2C+CA&radius=100&vjk=8f7a29247d806efb",
         "Bangalore, India": null,
         "Shenzhen, China": null,
         "Tel Aviv, Israel": null,
