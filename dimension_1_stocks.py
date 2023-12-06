@@ -1,118 +1,114 @@
 import asyncio
 from database.database_module import DatabaseManager
-from utilities.data_utilities import DataCalculations
+from utilities.date_utilities import DateUtilities
 from utilities.json_dimension_1_manager import JSONStocksDataExtractor
-from utilities.json_dimension_1_manager import JSONStocksDayDataSetter
-from utilities.json_dimension_1_manager import JSONStocksDayDataValidator
 import yfinance as yf
 
 
-class GetStockPrices:
-    def __init__(self) -> None:
-        self.ticker_processor = JSONStocksDataExtractor()
+class StockPriceDifference:
+    def __init__(self, date_utilities: DateUtilities) -> None:
+        self.date_utilities = date_utilities
+        self.end_date = self.date_utilities.todays_date_str()
+        self.start_date = self.date_utilities.year_ago_date_str(self.end_date)
 
-    def get_stock_price(self, ticker: str) -> float:
-        """Get stock price for ticker_symbol argument
+    def get_historical_data(self, ticker_symbol):
+
+        data = yf.download(ticker_symbol,
+                           start=self.start_date, end=self.end_date)
+
+        opening_prices_list = data['Open'].tolist()
+        return opening_prices_list
+
+    def extract_price_pairs(self, input_list: list) -> list[tuple]:
+        if len(input_list) < 2:
+            raise ValueError("Input list should have at least two elements.")
+        tuple_list = [(input_list[i], input_list[i + 1])
+                      for i in range(len(input_list) - 1)]
+        return tuple_list
+
+    @staticmethod
+    def calculate_price_difference(price_pair: tuple) -> float:
+        """Calculate increase/decrease between 2 prices
 
         Args:
-            ticker (str): Company ticker symbol
+            new_value (float):
+            old_value (float): 
 
         Returns:
-            float: Current price of a compeny stock
+            float: increase/descrease difference between 2 numbers
         """
-        ticker_object = yf.Ticker(ticker)
-        price = ticker_object.info['currentPrice']
-        return price
+        new_value = price_pair[0]
+        old_value = price_pair[1]
+        return round((old_value - new_value) / new_value, 4)
 
-    async def generate_stock_prices(self) -> dict:
-        """Async method that retrieves prices for 100 companies, next ticker iteration is after previous ticker price is processed
-
-        Returns:
-            dict: 2 keys: 'ticker' : with value that is list of tickers,
-                          'prices' : list of prices for provides ticker symbols
-        """
-        tickers = self.ticker_processor.get_ticker_symbols()
-        data_dict = {'tickers': tickers,
-                     'prices': []}
-        prices = []
-
-        async def process_ticker(ticker):
-            price = self.get_stock_price(ticker)
-            prices.append(price)
-
-        for ticker in tickers:
-            await process_ticker(ticker)
-
-        data_dict['prices'] = prices
-        return data_dict
-
-
-class StocksDataGenerator:
-    def __init__(self) -> None:
-        self.json_data_validate = JSONStocksDayDataValidator()
-        self.json_set_data = JSONStocksDayDataSetter()
-        self.price_generator = GetStockPrices()
-        self.data_utilities = DataCalculations()
-        self.database_manager = DatabaseManager()
-
-    async def generate_stocks_prices(self):
-        """Instance of GetStockPrices class and use of async generate_stock_prices method
-
-        Returns:
-            dict: 2 keys: 'ticker' : with value that is list of tickers,
-                          'prices' : list of prices for provides ticker symbols
-        """
-        result = await self.price_generator.generate_stock_prices()
+    def historical_price_difference(self, price_pairs_list: list[tuple]) -> list:
+        result = [self.calculate_price_difference(
+            price_pair) for price_pair in price_pairs_list]
         return result
-    
-    def set_stocks_data(self):
-        """ Daily routine for stock price retireval and saver of that data
 
-        Returns:
-            confirmation message
-        """
+    def get_stock_price_data(self, ticker_symbol) -> list:
+        historical_data = self.get_historical_data(ticker_symbol)
+        historical_data_pairs = self.extract_price_pairs(historical_data)
+        price_difference = self.historical_price_difference(
+            historical_data_pairs)
 
-        # set DB data
-        todays_date = self.json_set_data.set_new_day_date()
-        price_difference_data = {
-            'tickers': None, 
-            'difference_in_prices': None
+        return price_difference
+
+
+# USAGE
+
+# class_instance = StockPriceDifference(DateUtilities())
+# data = [147.07000732421875, 142.19000244140625, 142.36000061035156, 142.33999633789062, 142.6999969482422, 149.5, 145.35000610351562, 141.11000061035156, 136.69000244140625, 135.11000061035156, 131.38999938964844, 132.97999572753906, 134.35000610351562, 130.9199981689453, 131.3800048828125, 129.6699981689453, 127.98999786376953, 128.41000366210938, 130.27999877929688, 126.88999938964844, 127.12999725341797, 126.01000213623047, 130.47000122070312, 130.25999450683594, 131.25, 133.8800048828125, 132.02999877929688, 134.8300018310547, 136.82000732421875, 134.0800018310547, 135.27999877929688, 138.1199951171875, 140.30999755859375, 140.88999938964844, 143.1699981689453, 143.16000366210938, 144.9600067138672, 142.6999969482422, 143.97000122070312, 148.89999389648438, 148.02999877929688, 152.57000732421875, 150.63999938964844, 153.8800048828125, 153.77999877929688, 149.4600067138672, 150.9499969482422, 152.1199951171875, 153.11000061035156, 153.50999450683594, 152.35000610351562, 150.1999969482422, 148.8699951171875, 150.08999633789062, 147.11000061035156, 147.7100067138672, 147.0500030517578, 146.8300018310547, 144.3800048828125, 148.0399932861328, 153.7899932861328, 153.6999969482422, 152.80999755859375, 153.55999755859375,
+# 150.2100067138672, 147.80999755859375, 151.27999877929688, 151.19000244140625, 152.16000366210938, 156.0800018310547, 155.07000732421875, 157.32000732421875, 159.3000030517578, 158.8300018310547, 158.86000061035156, 159.94000244140625, 157.97000122070312, 159.3699951171875, 161.52999877929688, 162.44000244140625, 164.27000427246094, 166.60000610351562, 164.74000549316406, 162.42999267578125, 161.4199981689453, 162.35000610351562, 161.22000122070312, 161.6300048828125, 164.58999633789062, 165.08999633789062, 166.10000610351562, 165.8000030517578, 166.08999633789062, 165.0500030517578, 165.0, 165.19000244140625, 163.05999755859375, 165.19000244140625, 168.49000549316406, 169.27999877929688, 170.08999633789062, 169.5, 164.88999938964844, 170.97999572753906, 172.47999572753906, 173.0500030517578, 173.02000427246094, 173.85000610351562, 173.6199951171875, 173.16000366210938, 171.99000549316406, 171.7100067138672, 173.0, 176.38999938964844, 173.97999572753906, 173.1300048828125, 171.08999633789062, 172.41000366210938, 173.32000732421875, 176.9600067138672, 177.3300018310547, 177.6999969482422, 181.02999877929688, 182.6300048828125, 179.97000122070312, 178.44000244140625, 177.89999389648438, 181.5, 181.27000427246094, 182.8000030517578, 183.3699951171875, 183.9600067138672, 186.72999572753906, 184.41000366210938, 184.89999389648438, 183.74000549316406, 185.5500030517578, 186.8300018310547, 185.88999938964844, 187.92999267578125, 189.0800018310547, 191.6300048828125, 193.77999877929688, 191.57000732421875, 189.83999633789062, 191.41000366210938, 189.25999450683594,
+# 189.16000366210938, 189.67999267578125, 190.5, 190.22999572753906, 191.89999389648438, 193.35000610351562, 193.10000610351562, 195.08999633789062, 194.10000610351562, 193.41000366210938, 193.3300018310547, 193.6699981689453, 196.02000427246094, 194.6699981689453, 196.05999755859375, 196.24000549316406, 195.0399932861328, 191.57000732421875, 185.52000427246094, 182.1300048828125, 179.69000244140625, 180.8699951171875, 179.47999572753906, 177.32000732421875, 177.97000122070312, 178.8800048828125, 177.1300048828125, 177.13999938964844, 172.3000030517578, 175.07000732421875, 177.05999755859375, 178.52000427246094, 180.6699981689453, 177.3800048828125, 180.08999633789062, 179.6999969482422, 184.94000244140625, 187.83999633789062, 189.49000549316406, 188.27999877929688, 188.39999389648438, 175.17999267578125, 178.35000610351562, 180.07000732421875, 179.49000549316406, 176.50999450683594, 174.0, 176.47999572753906, 176.47999572753906, 177.52000427246094, 179.25999450683594, 174.5500030517578, 174.6699981689453, 174.1999969482422, 174.82000732421875, 172.6199951171875, 169.33999633789062, 172.02000427246094, 171.22000122070312, 172.25999450683594, 171.08999633789062, 173.7899932861328, 173.8000030517578, 176.80999755859375, 178.10000610351562, 178.1999969482422, 180.07000732421875, 181.4199981689453, 176.75, 176.64999389648438, 175.5800018310547, 176.0399932861328, 175.30999755859375, 170.91000366210938, 173.0500030517578, 171.8800048828125, 170.3699951171875, 166.91000366210938, 169.02000427246094, 169.35000610351562, 171.0, 175.52000427246094, 174.24000549316406,
+# 176.3800048828125, 179.17999267578125, 182.35000610351562, 182.9600067138672, 183.97000122070312, 185.82000732421875, 187.6999969482422, 187.85000610351562, 189.57000732421875, 190.25, 189.88999938964844, 191.41000366210938, 191.49000549316406, 190.8699951171875, 189.9199981689453, 189.77999877929688, 190.89999389648438, 189.83999633789062, 190.3300018310547, 189.97999572753906, 190.2100067138672]
+# data_pair = (189.97999572753906, 190.2100067138672)
+# print(class_instance.get_historical_data('AAPL'))
+# print(class_instance.extract_price_pairs(data))
+# print(class_instance.calculate_price_difference(data_pair))
+# print(class_instance.historical_price_difference(data))
+# print(class_instance.get_stock_price_data('AAPL'))
+
+
+class GetStocksPricesData:
+    def __init__(self, json_data_extractor: JSONStocksDataExtractor, date_utilities: DateUtilities) -> None:
+        self.json_data_extractor = json_data_extractor
+        self.date_utilities = date_utilities
+        self.ticker_symbols = self.json_data_extractor.get_ticker_symbols()
+
+    def setup_stocks_data_structure(self):
+        end_date = self.date_utilities.todays_date_str()
+        start_date = self.date_utilities.year_ago_date_str(end_date)
+        data_structure = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'stocks_data': {}
         }
-        
-        # retrieve stocks prices
-        generate_prices = asyncio.run(self.generate_stocks_prices())
+        return data_structure
 
-        # set jsnon current day data
-        self.json_set_data.set_new_day_data(generate_prices)
+    def get_stocks_prices_data(self) -> dict:
+        stocks_data = {}
+        get_stock_data_instance = StockPriceDifference(self.date_utilities)
+        for ticker_symbol in self.ticker_symbols:
+            stocks_data[ticker_symbol] = get_stock_data_instance.get_stock_price_data(
+                ticker_symbol)
 
-        # checks if previous day has data, if not it means it is first iteration 
-        if self.json_data_validate.validate_day_data('P'):
-            # creates data for difference calculation and DB
-            stock_price_values = self.json_set_data.get_stocks_data()
+        return stocks_data
 
-            # set ticker symbols into price_difference_data
-            price_difference_data['tickers'] = stock_price_values['tickers']
+    def stocks_data(self):
+        result = self.setup_stocks_data_structure()
+        result['stocks_data'] = self.get_stocks_prices_data()
 
-            # current and previous day data for difference calculation
-            current_prices = stock_price_values['current_day_prices']
-            previous_prices = stock_price_values['previous_day_prices']
-            difference = [self.data_utilities.calculate_difference(new_value, old_value) for new_value, old_value in zip(current_prices, previous_prices)]
-            price_difference_data['difference_in_prices'] = difference
+        return result
 
-            db_data = (todays_date, price_difference_data)
-            sql_query = "INSERT INTO stocks_data (data_date, stocks_data) " \
-                    "VALUES (%s, %s)"
-            self.database_manager.save_data(sql_query, db_data)
 
-            # copy current day data to previous day
-            self.json_set_data.copy_new_day_data_to_previous()
+# ## USAGE
+class_instance = GetStocksPricesData(
+    JSONStocksDataExtractor(), DateUtilities())
+# print(class_instance.setup_stocks_data_structure())
+print(class_instance.stocks_data())
 
-            # clear json current day data
-            self.json_set_data.clear_new_day_data()
-
-            return f"Data is saved for {todays_date}"
-
-  
-## USAGE
-# class_instance = StocksDataGenerator()
-# print(class_instance.set_stocks_data())
+# class StoreompaniesStockPriceData:
+#     def __init__(self) -> None:
+#         # GetCompaniesStockPriceData i date class za zavrsni
+#         pass
